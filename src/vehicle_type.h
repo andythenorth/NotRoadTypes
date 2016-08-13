@@ -23,6 +23,7 @@ enum VehicleType {
 
 	VEH_TRAIN = VEH_BEGIN,        ///< %Train vehicle type.
 	VEH_ROAD,                     ///< Road vehicle type.
+	VEH_TRAM = VEH_ROAD,          ///< Tram vehicle type.
 	VEH_SHIP,                     ///< %Ship vehicle type.
 	VEH_AIRCRAFT,                 ///< %Aircraft vehicle type.
 

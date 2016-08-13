@@ -18,6 +18,7 @@
 
 struct Window *ShowBuildRoadToolbar(RoadType roadtype);
 struct Window *ShowBuildRoadScenToolbar();
+struct Window *ShowBuildLtRailToolbar(RoadType roadtype);
 void ConnectRoadToStructure(TileIndex tile, DiagDirection direction);
 
 #endif /* ROAD_GUI_H */

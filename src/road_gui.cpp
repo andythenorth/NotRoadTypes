@@ -670,6 +670,348 @@ struct BuildRoadToolbarWindow : Window {
 	static HotkeyList hotkeys;
 };
 
+struct BuildTramToolbarWindow : Window {
+	int last_started_action; ///< Last started user action.
+
+	BuildTramToolbarWindow(WindowDesc *desc, WindowNumber window_number) : Window(desc)
+	{
+		this->InitNested(window_number);
+		this->SetWidgetsDisabledState(true,
+			WID_ROT_REMOVE,
+			WIDGET_LIST_END);
+
+		this->OnInvalidateData();
+		this->last_started_action = WIDGET_LIST_END;
+
+		if (_settings_client.gui.link_terraform_toolbar) ShowTerraformToolbar(this);
+	}
+
+	~BuildTramToolbarWindow()
+	{
+		if (_settings_client.gui.link_terraform_toolbar) DeleteWindowById(WC_SCEN_LAND_GEN, 0, false);
+	}
+
+	/**
+	* Some data on this window has become invalid.
+	* @param data Information about the changed data.
+	* @param gui_scope Whether the call is done from GUI scope. You may not do everything when not in GUI scope. See #InvalidateWindowData() for details.
+	*/
+	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
+	{
+		if (!gui_scope) return;
+
+		bool can_build = CanBuildVehicleInfrastructure(VEH_ROAD);
+		this->SetWidgetsDisabledState(!can_build,
+			WID_ROT_DEPOT,
+			WID_ROT_BUS_STATION,
+			WID_ROT_TRUCK_STATION,
+			WIDGET_LIST_END);
+		if (!can_build) {
+			DeleteWindowById(WC_BUILD_DEPOT, TRANSPORT_ROAD);
+			DeleteWindowById(WC_BUS_STATION, TRANSPORT_ROAD);
+			DeleteWindowById(WC_TRUCK_STATION, TRANSPORT_ROAD);
+		}
+	}
+
+	/**
+	* Update the remove button lowered state of the road toolbar
+	*
+	* @param clicked_widget The widget which the client clicked just now
+	*/
+	void UpdateOptionWidgetStatus(RoadToolbarWidgets clicked_widget)
+	{
+		/* The remove and the one way button state is driven
+		 * by the other buttons so they don't act on themselves.
+		 * Both are only valid if they are able to apply as options. */
+		switch (clicked_widget) {
+		case WID_ROT_REMOVE:
+			break;
+
+		case WID_ROT_BUS_STATION:
+		case WID_ROT_TRUCK_STATION:
+			this->SetWidgetDisabledState(WID_ROT_REMOVE, !this->IsWidgetLowered(clicked_widget));
+			break;
+
+		case WID_ROT_ROAD_X:
+		case WID_ROT_ROAD_Y:
+		case WID_ROT_AUTOROAD:
+			this->SetWidgetsDisabledState(!this->IsWidgetLowered(clicked_widget),
+				WID_ROT_REMOVE,
+				WIDGET_LIST_END);
+			break;
+
+		default:
+			/* When any other buttons than road/station, raise and
+			* disable the removal button */
+			this->SetWidgetsDisabledState(true,
+				WID_ROT_REMOVE,
+				WIDGET_LIST_END);
+			this->SetWidgetsLoweredState(false,
+				WID_ROT_REMOVE,
+				WIDGET_LIST_END);
+			break;
+		}
+	}
+
+	virtual void OnClick(Point pt, int widget, int click_count)
+	{
+		_remove_button_clicked = false;
+		_one_way_button_clicked = false;
+		switch (widget) {
+		case WID_ROT_ROAD_X:
+			HandlePlacePushButton(this, WID_ROT_ROAD_X, _road_type_infos[_cur_roadtype].cursor_nwse, HT_RECT);
+			this->last_started_action = widget;
+			break;
+
+		case WID_ROT_ROAD_Y:
+			HandlePlacePushButton(this, WID_ROT_ROAD_Y, _road_type_infos[_cur_roadtype].cursor_nesw, HT_RECT);
+			this->last_started_action = widget;
+			break;
+
+		case WID_ROT_AUTOROAD:
+			HandlePlacePushButton(this, WID_ROT_AUTOROAD, _road_type_infos[_cur_roadtype].cursor_autoroad, HT_RECT);
+			this->last_started_action = widget;
+			break;
+
+		case WID_ROT_DEMOLISH:
+			HandlePlacePushButton(this, WID_ROT_DEMOLISH, ANIMCURSOR_DEMOLISH, HT_RECT | HT_DIAGONAL);
+			this->last_started_action = widget;
+			break;
+
+		case WID_ROT_DEPOT:
+			if (_game_mode == GM_EDITOR || !CanBuildVehicleInfrastructure(VEH_ROAD)) return;
+			if (HandlePlacePushButton(this, WID_ROT_DEPOT, SPR_CURSOR_ROAD_DEPOT, HT_RECT)) {
+				ShowRoadDepotPicker(this);
+				this->last_started_action = widget;
+			}
+			break;
+
+		case WID_ROT_BUS_STATION:
+			if (_game_mode == GM_EDITOR || !CanBuildVehicleInfrastructure(VEH_ROAD)) return;
+			if (HandlePlacePushButton(this, WID_ROT_BUS_STATION, SPR_CURSOR_BUS_STATION, HT_RECT)) {
+				ShowRVStationPicker(this, ROADSTOP_BUS);
+				this->last_started_action = widget;
+			}
+			break;
+
+		case WID_ROT_TRUCK_STATION:
+			if (_game_mode == GM_EDITOR || !CanBuildVehicleInfrastructure(VEH_ROAD)) return;
+			if (HandlePlacePushButton(this, WID_ROT_TRUCK_STATION, SPR_CURSOR_TRUCK_STATION, HT_RECT)) {
+				ShowRVStationPicker(this, ROADSTOP_TRUCK);
+				this->last_started_action = widget;
+			}
+			break;
+
+		case WID_ROT_BUILD_BRIDGE:
+			HandlePlacePushButton(this, WID_ROT_BUILD_BRIDGE, SPR_CURSOR_BRIDGE, HT_RECT);
+			this->last_started_action = widget;
+			break;
+
+		case WID_ROT_BUILD_TUNNEL:
+			HandlePlacePushButton(this, WID_ROT_BUILD_TUNNEL, SPR_CURSOR_ROAD_TUNNEL, HT_SPECIAL);
+			this->last_started_action = widget;
+			break;
+
+		case WID_ROT_REMOVE:
+			if (this->IsWidgetDisabled(WID_ROT_REMOVE)) return;
+
+			DeleteWindowById(WC_SELECT_STATION, 0);
+			ToggleRoadButton_Remove(this);
+			if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
+			break;
+
+		default: NOT_REACHED();
+		}
+		this->UpdateOptionWidgetStatus((RoadToolbarWidgets)widget);
+		if (_ctrl_pressed) RoadToolbar_CtrlChanged(this);
+	}
+
+	virtual EventState OnHotkey(int hotkey)
+	{
+		MarkTileDirtyByTile(TileVirtXY(_thd.pos.x, _thd.pos.y)); // redraw tile selection
+		return Window::OnHotkey(hotkey);
+	}
+
+	virtual void OnPlaceObject(Point pt, TileIndex tile)
+	{
+		_remove_button_clicked = this->IsWidgetLowered(WID_ROT_REMOVE);
+		_one_way_button_clicked = this->IsWidgetLowered(WID_ROT_ONE_WAY);
+		switch (this->last_started_action) {
+		case WID_ROT_ROAD_X:
+			_place_road_flag = RF_DIR_X;
+			if (_tile_fract_coords.x >= 8) _place_road_flag |= RF_START_HALFROAD_X;
+			VpStartPlaceSizing(tile, VPM_FIX_Y, DDSP_PLACE_ROAD_X_DIR);
+			break;
+
+		case WID_ROT_ROAD_Y:
+			_place_road_flag = RF_DIR_Y;
+			if (_tile_fract_coords.y >= 8) _place_road_flag |= RF_START_HALFROAD_Y;
+			VpStartPlaceSizing(tile, VPM_FIX_X, DDSP_PLACE_ROAD_Y_DIR);
+			break;
+
+		case WID_ROT_AUTOROAD:
+			_place_road_flag = RF_NONE;
+			if (_tile_fract_coords.x >= 8) _place_road_flag |= RF_START_HALFROAD_X;
+			if (_tile_fract_coords.y >= 8) _place_road_flag |= RF_START_HALFROAD_Y;
+			VpStartPlaceSizing(tile, VPM_X_OR_Y, DDSP_PLACE_AUTOROAD);
+			break;
+
+		case WID_ROT_DEMOLISH:
+			PlaceProc_DemolishArea(tile);
+			break;
+
+		case WID_ROT_DEPOT:
+			DoCommandP(tile, _cur_roadtype << 2 | _road_depot_orientation, 0,
+				CMD_BUILD_ROAD_DEPOT | CMD_MSG(_road_type_infos[_cur_roadtype].err_depot), CcRoadDepot);
+			break;
+
+		case WID_ROT_BUS_STATION:
+			PlaceRoad_BusStation(tile);
+			break;
+
+		case WID_ROT_TRUCK_STATION:
+			PlaceRoad_TruckStation(tile);
+			break;
+
+		case WID_ROT_BUILD_BRIDGE:
+			PlaceRoad_Bridge(tile, this);
+			break;
+
+		case WID_ROT_BUILD_TUNNEL:
+			DoCommandP(tile, RoadTypeToRoadTypes(_cur_roadtype) | (TRANSPORT_ROAD << 8), 0,
+				CMD_BUILD_TUNNEL | CMD_MSG(STR_ERROR_CAN_T_BUILD_TUNNEL_HERE), CcBuildRoadTunnel);
+			break;
+
+		default: NOT_REACHED();
+		}
+	}
+
+	virtual void OnPlaceObjectAbort()
+	{
+		this->RaiseButtons();
+		this->SetWidgetsDisabledState(true,
+			WID_ROT_REMOVE,
+			WIDGET_LIST_END);
+		this->SetWidgetDirty(WID_ROT_REMOVE);
+
+		DeleteWindowById(WC_BUS_STATION, TRANSPORT_ROAD);
+		DeleteWindowById(WC_TRUCK_STATION, TRANSPORT_ROAD);
+		DeleteWindowById(WC_BUILD_DEPOT, TRANSPORT_ROAD);
+		DeleteWindowById(WC_SELECT_STATION, 0);
+		DeleteWindowByClass(WC_BUILD_BRIDGE);
+	}
+
+	virtual void OnPlaceDrag(ViewportPlaceMethod select_method, ViewportDragDropSelectionProcess select_proc, Point pt)
+	{
+		/* Here we update the end tile flags
+		* of the road placement actions.
+		* At first we reset the end halfroad
+		* bits and if needed we set them again. */
+		switch (select_proc) {
+		case DDSP_PLACE_ROAD_X_DIR:
+			_place_road_flag &= ~RF_END_HALFROAD_X;
+			if (pt.x & 8) _place_road_flag |= RF_END_HALFROAD_X;
+			break;
+
+		case DDSP_PLACE_ROAD_Y_DIR:
+			_place_road_flag &= ~RF_END_HALFROAD_Y;
+			if (pt.y & 8) _place_road_flag |= RF_END_HALFROAD_Y;
+			break;
+
+		case DDSP_PLACE_AUTOROAD:
+			_place_road_flag &= ~(RF_END_HALFROAD_Y | RF_END_HALFROAD_X);
+			if (pt.y & 8) _place_road_flag |= RF_END_HALFROAD_Y;
+			if (pt.x & 8) _place_road_flag |= RF_END_HALFROAD_X;
+
+			/* For autoroad we need to update the
+			* direction of the road */
+			if (_thd.size.x > _thd.size.y || (_thd.size.x == _thd.size.y &&
+				((_tile_fract_coords.x < _tile_fract_coords.y && (_tile_fract_coords.x + _tile_fract_coords.y) < 16) ||
+				(_tile_fract_coords.x > _tile_fract_coords.y && (_tile_fract_coords.x + _tile_fract_coords.y) > 16)))) {
+				/* Set dir = X */
+				_place_road_flag &= ~RF_DIR_Y;
+			}
+			else {
+				/* Set dir = Y */
+				_place_road_flag |= RF_DIR_Y;
+			}
+
+			break;
+
+		default:
+			break;
+		}
+
+		VpSelectTilesWithMethod(pt.x, pt.y, select_method);
+	}
+
+	virtual void OnPlaceMouseUp(ViewportPlaceMethod select_method, ViewportDragDropSelectionProcess select_proc, Point pt, TileIndex start_tile, TileIndex end_tile)
+	{
+		if (pt.x != -1) {
+			switch (select_proc) {
+			default: NOT_REACHED();
+			case DDSP_BUILD_BRIDGE:
+				if (!_settings_client.gui.persistent_buildingtools) ResetObjectToPlace();
+				ShowBuildBridgeWindow(start_tile, end_tile, TRANSPORT_ROAD, RoadTypeToRoadTypes(_cur_roadtype));
+				break;
+
+			case DDSP_DEMOLISH_AREA:
+				GUIPlaceProcDragXY(select_proc, start_tile, end_tile);
+				break;
+
+			case DDSP_PLACE_ROAD_X_DIR:
+			case DDSP_PLACE_ROAD_Y_DIR:
+			case DDSP_PLACE_AUTOROAD:
+				/* Flag description:
+				* Use the first three bits (0x07) if dir == Y
+				* else use the last 2 bits (X dir has
+				* not the 3rd bit set) */
+				_place_road_flag = (RoadFlags)((_place_road_flag & RF_DIR_Y) ? (_place_road_flag & 0x07) : (_place_road_flag >> 3));
+
+				DoCommandP(start_tile, end_tile, _place_road_flag | (_cur_roadtype << 3) | (_one_way_button_clicked << 5),
+					_remove_button_clicked ?
+					CMD_REMOVE_LONG_ROAD | CMD_MSG(_road_type_infos[_cur_roadtype].err_remove_road) :
+					CMD_BUILD_LONG_ROAD | CMD_MSG(_road_type_infos[_cur_roadtype].err_build_road), CcPlaySound_SPLAT_OTHER);
+				break;
+
+			case DDSP_BUILD_BUSSTOP:
+				PlaceRoadStop(start_tile, end_tile, (_ctrl_pressed << 5) | RoadTypeToRoadTypes(_cur_roadtype) << 2 | ROADSTOP_BUS, CMD_BUILD_ROAD_STOP | CMD_MSG(_road_type_infos[_cur_roadtype].err_build_station[ROADSTOP_BUS]));
+				break;
+
+			case DDSP_BUILD_TRUCKSTOP:
+				PlaceRoadStop(start_tile, end_tile, (_ctrl_pressed << 5) | RoadTypeToRoadTypes(_cur_roadtype) << 2 | ROADSTOP_TRUCK, CMD_BUILD_ROAD_STOP | CMD_MSG(_road_type_infos[_cur_roadtype].err_build_station[ROADSTOP_TRUCK]));
+				break;
+
+			case DDSP_REMOVE_BUSSTOP: {
+				TileArea ta(start_tile, end_tile);
+				DoCommandP(ta.tile, ta.w | ta.h << 8, (_ctrl_pressed << 1) | ROADSTOP_BUS, CMD_REMOVE_ROAD_STOP | CMD_MSG(_road_type_infos[_cur_roadtype].err_remove_station[ROADSTOP_BUS]), CcPlaySound_SPLAT_OTHER);
+				break;
+			}
+
+			case DDSP_REMOVE_TRUCKSTOP: {
+				TileArea ta(start_tile, end_tile);
+				DoCommandP(ta.tile, ta.w | ta.h << 8, (_ctrl_pressed << 1) | ROADSTOP_TRUCK, CMD_REMOVE_ROAD_STOP | CMD_MSG(_road_type_infos[_cur_roadtype].err_remove_station[ROADSTOP_TRUCK]), CcPlaySound_SPLAT_OTHER);
+				break;
+			}
+			}
+		}
+	}
+
+	virtual void OnPlacePresize(Point pt, TileIndex tile)
+	{
+		DoCommand(tile, RoadTypeToRoadTypes(_cur_roadtype) | (TRANSPORT_ROAD << 8), 0, DC_AUTO, CMD_BUILD_TUNNEL);
+		VpSetPresizeRange(tile, _build_tunnel_endtile == 0 ? tile : _build_tunnel_endtile);
+	}
+
+	virtual EventState OnCTRLStateChange()
+	{
+		if (RoadToolbar_CtrlChanged(this)) return ES_HANDLED;
+		return ES_NOT_HANDLED;
+	}
+
+	static HotkeyList hotkeys;
+};
+
 /**
  * Handler for global hotkeys of the BuildRoadToolbarWindow.
  * @param hotkey Hotkey
@@ -808,7 +1150,23 @@ Window *ShowBuildRoadToolbar(RoadType roadtype)
 	_cur_roadtype = roadtype;
 
 	DeleteWindowByClass(WC_BUILD_TOOLBAR);
-	return AllocateWindowDescFront<BuildRoadToolbarWindow>(roadtype == ROADTYPE_ROAD ? &_build_road_desc : &_build_tramway_desc, TRANSPORT_ROAD);
+	return AllocateWindowDescFront<BuildRoadToolbarWindow>(&_build_road_desc, TRANSPORT_ROAD);
+}
+
+/**
+* Open the build light rail toolbar window
+*
+* If the terraform toolbar is linked to the toolbar, that window is also opened.
+*
+* @return newly opened tram toolbar, or NULL if the toolbar could not be opened.
+*/
+Window *ShowBuildLtRailToolbar(RoadType roadtype)
+{
+	if (!Company::IsValidID(_local_company)) return NULL;
+	_cur_roadtype = roadtype;
+
+	DeleteWindowByClass(WC_BUILD_TOOLBAR);
+	return AllocateWindowDescFront<BuildTramToolbarWindow>(&_build_tramway_desc, TRANSPORT_ROAD);
 }
 
 static const NWidgetPart _nested_build_road_scen_widgets[] = {
