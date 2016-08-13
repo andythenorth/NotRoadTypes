@@ -2212,7 +2212,14 @@ static NWidgetBase *MakeMainToolbar(int *biggest_index)
 	NWidgetMainToolbarContainer *hor = new NWidgetMainToolbarContainer();
 	for (uint i = 0; i < WID_TN_END; i++) {
 		switch (i) {
-			case 4: case 8: case 15: case 19: case 21: case 26: hor->Add(new NWidgetSpacer(0, 0)); break;
+			case WID_TN_SMALL_MAP:
+			case WID_TN_FINANCES:
+			case WID_TN_VEHICLE_START:
+			case WID_TN_ZOOM_IN:
+			case WID_TN_BUILDING_TOOLS_START:
+			case WID_TN_MUSIC_SOUND:
+				hor->Add(new NWidgetSpacer(0, 0));
+				break;
 		}
 		hor->Add(new NWidgetLeaf(i == WID_TN_SAVE ? WWT_IMGBTN_2 : WWT_IMGBTN, COLOUR_GREY, i, toolbar_button_sprites[i], STR_TOOLBAR_TOOLTIP_PAUSE_GAME + i));
 	}
