@@ -237,6 +237,7 @@ linkgraph/linkgraphschedule.h
 linkgraph/mcf.h
 linkgraph/refresh.h
 livery.h
+ltrail_gui.h
 map_func.h
 map_type.h
 mixer.h
@@ -469,6 +470,7 @@ highscore_gui.cpp
 industry_gui.cpp
 intro_gui.cpp
 linkgraph/linkgraph_gui.cpp
+ltrail_gui.cpp
 main_gui.cpp
 misc_gui.cpp
 music_gui.cpp

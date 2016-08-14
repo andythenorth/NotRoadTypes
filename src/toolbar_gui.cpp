@@ -18,6 +18,7 @@
 #include "vehicle_gui.h"
 #include "rail_gui.h"
 #include "road_gui.h"
+#include "ltrail_gui.h"
 #include "date_func.h"
 #include "vehicle_func.h"
 #include "sound_func.h"

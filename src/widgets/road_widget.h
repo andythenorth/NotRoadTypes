@@ -54,4 +54,29 @@ enum BuildRoadStationWidgets {
 	WID_BROS_INFO,          ///< Station acceptance info.
 };
 
+/** Widgets of the #BuildLtRailToolbarWindow class. */
+enum LtRailToolbarWidgets {
+	WID_LRT_ROAD_X,         ///< Build light rail in x-direction.
+	WID_LRT_ROAD_Y,         ///< Build light rail in y-direction.
+	WID_LRT_AUTOROAD,       ///< Autorail.
+	WID_LRT_DEMOLISH,       ///< Demolish.
+	WID_LRT_DEPOT,          ///< Build depot.
+	WID_LRT_PAX_STATION,    ///< Build passenger station.
+	WID_LRT_FREIGHT_STATION,///< Build freight station.
+	WID_LRT_BUILD_BRIDGE,   ///< Build bridge.
+	WID_LRT_BUILD_TUNNEL,   ///< Build tunnel.
+	WID_LRT_REMOVE,         ///< Remove light rail.
+};
+
+/** Widgets of the #BuildLtRailStationWindow class. */
+enum BuildLtRailStationWidgets {
+	WID_BLRS_CAPTION,       ///< Caption of the window.
+	WID_BLRS_BACKGROUND,    ///< Background of the window.
+	WID_BLRS_STATION_X,     ///< Drive-through station in x-direction.
+	WID_BLRS_STATION_Y,     ///< Drive-through station in y-direction.
+	WID_BLRS_LT_OFF,        ///< Turn off area highlight.
+	WID_BLRS_LT_ON,         ///< Turn on area highlight.
+	WID_BLRS_INFO,          ///< Station acceptance info.
+};
+
 #endif /* WIDGETS_ROAD_WIDGET_H */
