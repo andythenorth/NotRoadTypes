@@ -1267,6 +1267,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\ltrail_gui.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\map_func.h"
 				>
 			</File>
@@ -2124,6 +2128,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\linkgraph\linkgraph_gui.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\ltrail_gui.cpp"
 				>
 			</File>
 			<File

@@ -723,6 +723,9 @@
     <ClInclude Include="..\src\livery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ltrail_gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\map_func.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1360,6 +1363,9 @@
       <Filter>GUI Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\src\linkgraph\linkgraph_gui.cpp">
+      <Filter>GUI Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ltrail_gui.cpp">
       <Filter>GUI Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\src\main_gui.cpp">

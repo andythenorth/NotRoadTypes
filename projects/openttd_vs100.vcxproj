@@ -498,6 +498,7 @@
     <ClInclude Include="..\src\linkgraph\mcf.h" />
     <ClInclude Include="..\src\linkgraph\refresh.h" />
     <ClInclude Include="..\src\livery.h" />
+    <ClInclude Include="..\src\ltrail_gui.h" />
     <ClInclude Include="..\src\map_func.h" />
     <ClInclude Include="..\src\map_type.h" />
     <ClInclude Include="..\src\mixer.h" />
@@ -711,6 +712,7 @@
     <ClCompile Include="..\src\industry_gui.cpp" />
     <ClCompile Include="..\src\intro_gui.cpp" />
     <ClCompile Include="..\src\linkgraph\linkgraph_gui.cpp" />
+    <ClCompile Include="..\src\ltrail_gui.cpp" />
     <ClCompile Include="..\src\main_gui.cpp" />
     <ClCompile Include="..\src\misc_gui.cpp" />
     <ClCompile Include="..\src\music_gui.cpp" />
