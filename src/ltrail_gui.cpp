@@ -635,7 +635,7 @@ static Hotkey ltrailtoolbar_hotkeys[] = {
 	Hotkey('4', "demolish", WID_LRT_DEMOLISH),
 	Hotkey('5', "depot", WID_LRT_DEPOT),
 	Hotkey('6', "pax_station", WID_LRT_PAX_STATION),
-	Hotkey('7', "goods_station", WID_LRT_FREIGHT_STATION),
+	Hotkey('7', "freight_station", WID_LRT_FREIGHT_STATION),
 	Hotkey('B', "bridge", WID_LRT_BUILD_BRIDGE),
 	Hotkey('T', "tunnel", WID_LRT_BUILD_TUNNEL),
 	Hotkey('R', "remove", WID_LRT_REMOVE),
