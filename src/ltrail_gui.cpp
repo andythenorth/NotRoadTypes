@@ -710,7 +710,7 @@ struct BuildLtRailStationWindow : public PickerWindowBase {
 		if (!IsInsideMM(widget, WID_BLRS_STATION_X, WID_BLRS_STATION_Y + 1)) return;
 
 		StationType st = (this->window_class == WC_BUS_STATION) ? STATION_BUS : STATION_TRUCK;
-		StationPickerDrawSprite(r.left + 1 + ScaleGUITrad(31), r.bottom - ScaleGUITrad(31), st, INVALID_RAILTYPE, _cur_ltrailtype, widget);
+		StationPickerDrawSprite(r.left + 1 + ScaleGUITrad(31), r.bottom - ScaleGUITrad(31), st, INVALID_RAILTYPE, ROADTYPE_TRAM, widget + 2); // + 2 because I removed the 2 widgets of the road stops
 	}
 
 	virtual void OnClick(Point pt, int widget, int click_count)
