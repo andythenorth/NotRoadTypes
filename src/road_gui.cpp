@@ -62,7 +62,7 @@ static RoadFlags _place_road_flag;
 static RoadType _cur_roadtype;
 
 static DiagDirection _road_depot_orientation;
-static DiagDirection _ltrail_station_picker_orientation;
+static DiagDirection _road_station_picker_orientation;
 
 void CcPlaySound_SPLAT_OTHER(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
@@ -223,7 +223,7 @@ void CcRoadStop(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
  */
 static void PlaceRoadStop(TileIndex start_tile, TileIndex end_tile, uint32 p2, uint32 cmd)
 {
-	uint8 ddir = _ltrail_station_picker_orientation;
+	uint8 ddir = _road_station_picker_orientation;
 	SB(p2, 16, 16, INVALID_STATION); // no station to join
 
 	if (ddir >= DIAGDIR_END) {
@@ -246,8 +246,8 @@ static void PlaceRoad_BusStation(TileIndex tile)
 	if (_remove_button_clicked) {
 		VpStartPlaceSizing(tile, VPM_X_AND_Y, DDSP_REMOVE_BUSSTOP);
 	} else {
-		if (_ltrail_station_picker_orientation < DIAGDIR_END) { // Not a drive-through stop.
-			VpStartPlaceSizing(tile, (DiagDirToAxis(_ltrail_station_picker_orientation) == AXIS_X) ? VPM_X_LIMITED : VPM_Y_LIMITED, DDSP_BUILD_BUSSTOP);
+		if (_road_station_picker_orientation < DIAGDIR_END) { // Not a drive-through stop.
+			VpStartPlaceSizing(tile, (DiagDirToAxis(_road_station_picker_orientation) == AXIS_X) ? VPM_X_LIMITED : VPM_Y_LIMITED, DDSP_BUILD_BUSSTOP);
 		} else {
 			VpStartPlaceSizing(tile, VPM_X_AND_Y_LIMITED, DDSP_BUILD_BUSSTOP);
 		}
@@ -264,8 +264,8 @@ static void PlaceRoad_TruckStation(TileIndex tile)
 	if (_remove_button_clicked) {
 		VpStartPlaceSizing(tile, VPM_X_AND_Y, DDSP_REMOVE_TRUCKSTOP);
 	} else {
-		if (_ltrail_station_picker_orientation < DIAGDIR_END) { // Not a drive-through stop.
-			VpStartPlaceSizing(tile, (DiagDirToAxis(_ltrail_station_picker_orientation) == AXIS_X) ? VPM_X_LIMITED : VPM_Y_LIMITED, DDSP_BUILD_TRUCKSTOP);
+		if (_road_station_picker_orientation < DIAGDIR_END) { // Not a drive-through stop.
+			VpStartPlaceSizing(tile, (DiagDirToAxis(_road_station_picker_orientation) == AXIS_X) ? VPM_X_LIMITED : VPM_Y_LIMITED, DDSP_BUILD_TRUCKSTOP);
 		} else {
 			VpStartPlaceSizing(tile, VPM_X_AND_Y_LIMITED, DDSP_BUILD_TRUCKSTOP);
 		}
@@ -914,8 +914,8 @@ struct BuildRoadStationWindow : public PickerWindowBase {
 		this->CreateNestedTree();
 
 		/* Trams don't have non-drivethrough stations */
-		if (_cur_roadtype == ROADTYPE_TRAM && _ltrail_station_picker_orientation < DIAGDIR_END) {
-			_ltrail_station_picker_orientation = DIAGDIR_END;
+		if (_cur_roadtype == ROADTYPE_TRAM && _road_station_picker_orientation < DIAGDIR_END) {
+			_road_station_picker_orientation = DIAGDIR_END;
 		}
 		this->SetWidgetsDisabledState(_cur_roadtype == ROADTYPE_TRAM,
 				WID_BROS_STATION_NE,
@@ -927,7 +927,7 @@ struct BuildRoadStationWindow : public PickerWindowBase {
 		this->GetWidget<NWidgetCore>(WID_BROS_CAPTION)->widget_data = _road_type_infos[_cur_roadtype].picker_title[rs];
 		for (uint i = WID_BROS_STATION_NE; i < WID_BROS_LT_OFF; i++) this->GetWidget<NWidgetCore>(i)->tool_tip = _road_type_infos[_cur_roadtype].picker_tooltip[rs];
 
-		this->LowerWidget(_ltrail_station_picker_orientation + WID_BROS_STATION_NE);
+		this->LowerWidget(_road_station_picker_orientation + WID_BROS_STATION_NE);
 		this->LowerWidget(_settings_client.gui.station_show_coverage + WID_BROS_LT_OFF);
 
 		this->FinishInitNested(TRANSPORT_ROAD);
@@ -992,9 +992,9 @@ struct BuildRoadStationWindow : public PickerWindowBase {
 			case WID_BROS_STATION_NW:
 			case WID_BROS_STATION_X:
 			case WID_BROS_STATION_Y:
-				this->RaiseWidget(_ltrail_station_picker_orientation + WID_BROS_STATION_NE);
-				_ltrail_station_picker_orientation = (DiagDirection)(widget - WID_BROS_STATION_NE);
-				this->LowerWidget(_ltrail_station_picker_orientation + WID_BROS_STATION_NE);
+				this->RaiseWidget(_road_station_picker_orientation + WID_BROS_STATION_NE);
+				_road_station_picker_orientation = (DiagDirection)(widget - WID_BROS_STATION_NE);
+				this->LowerWidget(_road_station_picker_orientation + WID_BROS_STATION_NE);
 				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				DeleteWindowById(WC_SELECT_STATION, 0);
@@ -1075,5 +1075,5 @@ static void ShowRVStationPicker(Window *parent, RoadStopType rs)
 void InitializeRoadGui()
 {
 	_road_depot_orientation = DIAGDIR_NW;
-	_ltrail_station_picker_orientation = DIAGDIR_NW;
+	_road_station_picker_orientation = DIAGDIR_NW;
 }
