@@ -1077,3 +1077,18 @@ void InitializeRoadGui()
 	_road_depot_orientation = DIAGDIR_NW;
 	_road_station_picker_orientation = DIAGDIR_NW;
 }
+
+/**
+* Create a drop down list for all the road types of the local company.
+* @param for_replacement Whether this list is for the replacement window.
+* @return The populated and sorted #DropDownList.
+*/
+DropDownList *GetRoadTypeDropDownList(bool for_replacement)
+{
+	DropDownList *list = new DropDownList();
+
+	/* Road is always visible and available. */
+	*list->Append() = new DropDownListStringItem(STR_ROAD_MENU_ROAD_CONSTRUCTION, ROADTYPE_ROAD, false);
+
+	return list;
+}

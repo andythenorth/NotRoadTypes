@@ -15,7 +15,9 @@
 #include "road_type.h"
 #include "tile_type.h"
 #include "direction_type.h"
+#include "widgets/dropdown_type.h"
 
 struct Window *ShowBuildLtRailToolbar(RoadType roadtype);
+DropDownList *GetLtRailTypeDropDownList(bool for_replacement = false);
 
 #endif /* LTRAIL_GUI_H */

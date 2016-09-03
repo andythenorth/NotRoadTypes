@@ -30,6 +30,7 @@
 #include "road_gui.h"
 #include "ltrail_gui.h"
 #include "zoom_func.h"
+#include "engine_base.h"
 
 #include "widgets/road_widget.h"
 
@@ -877,4 +878,27 @@ static WindowDesc _build_road_depot_desc(
 static void ShowRoadDepotPicker(Window *parent)
 {
 	new BuildRoadDepotWindow(&_build_road_depot_desc, parent);
+}
+
+/**
+* Create a drop down list for all the light rail types of the local company.
+* @param for_replacement Whether this list is for the replacement window.
+* @return The populated and sorted #DropDownList.
+*/
+DropDownList *GetLtRailTypeDropDownList(bool for_replacement)
+{
+	const Company *c = Company::Get(_local_company);
+	DropDownList *list = new DropDownList();
+
+	/* Tram is only visible when there will be a tram, and available when that has been introduced. */
+	Engine *e;
+	FOR_ALL_ENGINES_OF_TYPE(e, VEH_ROAD) {
+		if (!HasBit(e->info.climates, _settings_game.game_creation.landscape)) continue;
+		if (!HasBit(e->info.misc_flags, EF_ROAD_TRAM)) continue;
+
+		*list->Append() = new DropDownListStringItem(STR_ROAD_MENU_TRAM_CONSTRUCTION, ROADTYPE_TRAM, !HasBit(c->avail_roadtypes, ROADTYPE_TRAM));
+		break;
+	}
+
+	return list;
 }
