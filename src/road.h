@@ -25,9 +25,11 @@
 /** Roadtype flags. Starts with RO instead of R because R is used for rails */
 enum RoadTypeFlags {
 	ROTF_CATENARY = 0,                   ///< Bit number for adding catenary
+	ROTF_DISALLOW_JUNCTIONS = 1,         ///< Bit number for disallowing junctions (only build straight line or curve)
 
 	ROTFB_NONE = 0,                      ///< All flags cleared.
 	ROTFB_CATENARY = 1 << ROTF_CATENARY, ///< Value for drawing a catenary.
+	ROTFB_DISALLOW_JUNCTIONS = 1 << ROTF_DISALLOW_JUNCTIONS, ///< Value for disallowing junctions.
 };
 DECLARE_ENUM_AS_BIT_SET(RoadTypeFlags)
 

@@ -124,6 +124,18 @@ static inline bool IsStraightRoad(RoadBits r)
 }
 
 /**
+ * Check if there is a road junction in a tile (curve is not a junction)
+ * 
+ * @param r The given RoadBits
+ * @return true if a junction is found
+ */
+static inline bool IsRoadJunction(RoadBits r)
+{
+	assert(IsValidRoadBits(r));
+	return (CountBits(r) > 2);
+}
+
+/**
  * Create the road-part which belongs to the given DiagDirection
  *
  * This function returns a RoadBits value which belongs to

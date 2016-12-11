@@ -626,6 +626,7 @@ CommandCost CmdBuildRoad(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 
 	RoadBits existing = ROAD_NONE;
 	RoadBits other_bits = ROAD_NONE;
+	RoadTypeIdentifiers existing_rtids;
 
 	/* Road pieces are max 4 bitset values (NE, NW, SE, SW) and town can only be non-zero
 	 * if a non-company is building the road */
@@ -668,6 +669,13 @@ CommandCost CmdBuildRoad(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 					if (!HasTileRoadType(tile, rtid.basetype)) break;
 
 					existing = GetRoadBits(tile, rtid.basetype);
+					existing_rtids = RoadTypeIdentifiers::FromTile(tile);
+					bool disallow_junctions = HasBit(GetRoadTypeInfo(rtid)->flags, ROTF_DISALLOW_JUNCTIONS)
+						|| HasBit(GetRoadTypeInfo(existing_rtids.GetType(rtid.basetype))->flags, ROTF_DISALLOW_JUNCTIONS);
+					if (rtid.IsRoad() && IsRoadJunction(existing | pieces) && disallow_junctions) {
+						/* Some roads disallow junctions */
+						return_cmd_error(STR_ERROR_ROADTYPE_DOESN_T_ALLOW_JUNCTIONS);
+					}
 					bool crossing = !IsStraightRoad(existing | pieces);
 					if (rtid.IsRoad() && (GetDisallowedRoadDirections(tile) != DRD_NONE || toggle_drd != DRD_NONE) && crossing) {
 						/* Junctions cannot be one-way */
