@@ -319,7 +319,8 @@ struct CompanyFinancesWindow : Window {
 			case WID_CF_EXPS_PRICE2:
 			case WID_CF_EXPS_PRICE3:
 				size->height = _expenses_list_types[type].GetHeight();
-				/* FALL THROUGH */
+				FALLTHROUGH;
+
 			case WID_CF_BALANCE_VALUE:
 			case WID_CF_LOAN_VALUE:
 			case WID_CF_TOTAL_VALUE:
@@ -637,7 +638,8 @@ public:
 					size->width = 0;
 					break;
 				}
-				/* FALL THROUGH */
+				FALLTHROUGH;
+
 			case WID_SCL_PRI_COL_DROPDOWN: {
 				int padding = this->square.width + NWidgetScrollbar::GetVerticalDimension().width + 10;
 				for (const StringID *id = _colour_dropdown; id != endof(_colour_dropdown); id++) {
@@ -893,7 +895,7 @@ void DrawCompanyManagerFace(CompanyManagerFace cmf, int colour, int x, int y)
 	for (CompanyManagerFaceVariable cmfv = CMFV_CHEEKS; cmfv < CMFV_END; cmfv++) {
 		switch (cmfv) {
 			case CMFV_MOUSTACHE:   if (!has_moustache)   continue; break;
-			case CMFV_LIPS:        // FALL THROUGH
+			case CMFV_LIPS:
 			case CMFV_NOSE:        if (has_moustache)    continue; break;
 			case CMFV_TIE_EARRING: if (!has_tie_earring) continue; break;
 			case CMFV_GLASSES:     if (!has_glasses)     continue; break;
@@ -1366,7 +1368,7 @@ public:
 			/* OK button */
 			case WID_SCMF_ACCEPT:
 				DoCommandP(0, 0, this->face, CMD_SET_COMPANY_MANAGER_FACE);
-				/* FALL THROUGH */
+				FALLTHROUGH;
 
 			/* Cancel button */
 			case WID_SCMF_CANCEL:
@@ -1563,7 +1565,7 @@ static const NWidgetPart _nested_company_infrastructure_widgets[] = {
 struct CompanyInfrastructureWindow : Window
 {
 	RailTypes railtypes; ///< Valid railtypes.
-	bool roadtypes[ROADTYPE_END][ROADSUBTYPE_END]; ///< Valid roadtypes.
+	RoadSubTypes roadtypes[ROADTYPE_END]; ///< Valid roadtypes.
 
 	uint total_width; ///< String width of the total cost line.
 
@@ -1578,8 +1580,8 @@ struct CompanyInfrastructureWindow : Window
 	void UpdateRailRoadTypes()
 	{
 		this->railtypes = RAILTYPES_NONE;
-		memset(this->roadtypes, 0, sizeof(this->roadtypes));
-		this->roadtypes[ROADTYPE_ROAD][ROADTYPE_BEGIN] = true; // Road is always available. // TODO
+		this->roadtypes[ROADTYPE_ROAD] = ROADSUBTYPES_NORMAL; // Road is always available. // TODO
+		this->roadtypes[ROADTYPE_TRAM] = ROADSUBTYPES_NONE;
 
 		/* Find the used railtypes. */
 		Engine *e;
@@ -1592,22 +1594,17 @@ struct CompanyInfrastructureWindow : Window
 		/* Get the date introduced railtypes as well. */
 		this->railtypes = AddDateIntroducedRailTypes(this->railtypes, MAX_DAY);
 
-		/* Tram is only visible when there will be a tram. */
+		/* Find the used roadtypes. */
 		FOR_ALL_ENGINES_OF_TYPE(e, VEH_ROAD) {
 			if (!HasBit(e->info.climates, _settings_game.game_creation.landscape)) continue;
 
-			if (HasBit(e->info.misc_flags, EF_ROAD_TRAM)) {
-				RoadTypeIdentifier rtid;
-				FOR_ALL_SORTED_ROADTYPES(rtid, ROADTYPE_TRAM) { // TODO
-					this->roadtypes[rtid.basetype][rtid.subtype] = true;
-				}
-			} else {
-				RoadTypeIdentifier rtid;
-				FOR_ALL_SORTED_ROADTYPES(rtid, ROADTYPE_ROAD) { // TODO
-					this->roadtypes[rtid.basetype][rtid.subtype] = true;
-				}
-			}
+			RoadTypeIdentifier rtid = e->GetRoadType();
+			this->roadtypes[rtid.basetype] |= GetRoadTypeInfo(rtid)->introduces_roadtypes;
 		}
+
+		/* Get the date introduced roadtypes as well. */
+		this->roadtypes[ROADTYPE_ROAD] = AddDateIntroducedRoadTypes(ROADTYPE_ROAD, this->roadtypes[ROADTYPE_ROAD], MAX_DAY);
+		this->roadtypes[ROADTYPE_TRAM] = AddDateIntroducedRoadTypes(ROADTYPE_TRAM, this->roadtypes[ROADTYPE_TRAM], MAX_DAY);
 	}
 
 	/** Get total infrastructure maintenance cost. */
@@ -1625,8 +1622,8 @@ struct CompanyInfrastructureWindow : Window
 		uint32 road_total = c->infrastructure.GetRoadTotal(ROADTYPE_ROAD);
 		uint32 tram_total = c->infrastructure.GetRoadTotal(ROADTYPE_TRAM);
 		for (RoadSubType rst = ROADSUBTYPE_BEGIN; rst < ROADSUBTYPE_END; rst++) {
-			if (this->roadtypes[ROADTYPE_ROAD][rst]) total += RoadMaintenanceCost(RoadTypeIdentifier(ROADTYPE_ROAD, rst), c->infrastructure.road[ROADTYPE_ROAD][rst], road_total);
-			if (this->roadtypes[ROADTYPE_TRAM][rst]) total += RoadMaintenanceCost(RoadTypeIdentifier(ROADTYPE_TRAM, rst), c->infrastructure.road[ROADTYPE_TRAM][rst], tram_total);
+			if (HasBit(this->roadtypes[ROADTYPE_ROAD], rst)) total += RoadMaintenanceCost(RoadTypeIdentifier(ROADTYPE_ROAD, rst), c->infrastructure.road[ROADTYPE_ROAD][rst], road_total);
+			if (HasBit(this->roadtypes[ROADTYPE_TRAM], rst)) total += RoadMaintenanceCost(RoadTypeIdentifier(ROADTYPE_TRAM, rst), c->infrastructure.road[ROADTYPE_TRAM][rst], tram_total);
 		}
 
 		total += CanalMaintenanceCost(c->infrastructure.water);
@@ -1679,7 +1676,7 @@ struct CompanyInfrastructureWindow : Window
 
 				RoadTypeIdentifier rtid;
 				FOR_ALL_SORTED_ROADTYPES(rtid, widget == WID_CI_ROAD_DESC ? ROADTYPE_ROAD : ROADTYPE_TRAM) {
-					if (this->roadtypes[rtid.basetype][rtid.subtype]) {
+					if (HasBit(this->roadtypes[rtid.basetype], rtid.subtype)) {
 						lines++;
 						SetDParam(0, GetRoadTypeInfo(rtid)->strings.name);
 						size->width = max(size->width, GetStringBoundingBox(STR_WHITE_STRING).width + WD_FRAMERECT_LEFT);
@@ -1824,7 +1821,7 @@ struct CompanyInfrastructureWindow : Window
 				/* Draw name of each valid roadtype. */
 				RoadTypeIdentifier rtid;
 				FOR_ALL_SORTED_ROADTYPES(rtid, widget == WID_CI_ROAD_DESC ? ROADTYPE_ROAD : ROADTYPE_TRAM) {
-					if (this->roadtypes[rtid.basetype][rtid.subtype]) {
+					if (HasBit(this->roadtypes[rtid.basetype], rtid.subtype)) {
 						SetDParam(0, GetRoadTypeInfo(rtid)->strings.name);
 						DrawString(r.left + offs_left, r.right - offs_right, y += FONT_HEIGHT_NORMAL, STR_WHITE_STRING);
 					}
@@ -1839,7 +1836,7 @@ struct CompanyInfrastructureWindow : Window
 				uint32 road_total = c->infrastructure.GetRoadTotal(rt);
 				RoadTypeIdentifier rtid;
 				FOR_ALL_SORTED_ROADTYPES(rtid, rt) {
-					if (this->roadtypes[rtid.basetype][rtid.subtype]) {
+					if (HasBit(this->roadtypes[rtid.basetype], rtid.subtype)) {
 						this->DrawCountLine(r, y, c->infrastructure.road[rtid.basetype][rtid.subtype], RoadMaintenanceCost(rtid, c->infrastructure.road[rtid.basetype][rtid.subtype], road_total));
 					}
 				}
@@ -2413,7 +2410,7 @@ struct CompanyWindow : Window
 
 	virtual void OnPlaceObject(Point pt, TileIndex tile)
 	{
-		if (DoCommandP(tile, OBJECT_HQ, 0, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_COMPANY_HEADQUARTERS))) {
+		if (DoCommandP(tile, OBJECT_HQ, 0, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_COMPANY_HEADQUARTERS)) && !_shift_pressed) {
 			ResetObjectToPlace();
 			this->RaiseButtons();
 		}

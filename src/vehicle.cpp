@@ -1269,7 +1269,7 @@ bool Vehicle::HandleBreakdown()
 			SetWindowDirty(WC_VEHICLE_VIEW, this->index);
 			SetWindowDirty(WC_VEHICLE_DETAILS, this->index);
 
-			/* FALL THROUGH */
+			FALLTHROUGH;
 		case 1:
 			/* Aircraft breakdowns end only when arriving at the airport */
 			if (this->type == VEH_AIRCRAFT) return false;
@@ -1714,10 +1714,11 @@ UnitID GetFreeUnitNumber(VehicleType type)
  * vehicle type. This to disable building stations etc. when
  * you are not allowed/able to have the vehicle type yet.
  * @param type the vehicle type to check this for
+ * @param subtype for road vehicles, either ROADTYPE_ROAD, ROADTYPE_TRAM or INVALID_ROADTYPE
  * @return true if there is any reason why you may build
  *         the infrastructure for the given vehicle type
  */
-bool CanBuildVehicleInfrastructure(VehicleType type)
+bool CanBuildVehicleInfrastructure(VehicleType type, uint subtype)
 {
 	assert(IsCompanyBuildableVehicleType(type));
 
@@ -1738,7 +1739,8 @@ bool CanBuildVehicleInfrastructure(VehicleType type)
 		/* Can we actually build the vehicle type? */
 		const Engine *e;
 		FOR_ALL_ENGINES_OF_TYPE(e, type) {
-			if (HasBit(e->company_avail, _local_company)) return true;
+			if ((type != VEH_ROAD || subtype == INVALID_ROADTYPE || subtype == e->GetRoadType().basetype) &&
+					HasBit(e->company_avail, _local_company)) return true;
 		}
 		return false;
 	}
@@ -1746,7 +1748,9 @@ bool CanBuildVehicleInfrastructure(VehicleType type)
 	/* We should be able to build infrastructure when we have the actual vehicle type */
 	const Vehicle *v;
 	FOR_ALL_VEHICLES(v) {
-		if (v->owner == _local_company && v->type == type) return true;
+		if (v->type == type &&
+				(type != VEH_ROAD || subtype == INVALID_ROADTYPE || subtype == RoadVehicle::From(v)->rtid.basetype) &&
+				v->owner == _local_company) return true;
 	}
 
 	return false;
@@ -2160,6 +2164,7 @@ void Vehicle::LeaveStation()
 	st->loading_vehicles.remove(this);
 
 	HideFillingPercent(&this->fill_percent_te_id);
+	trip_occupancy = CalcPercentVehicleFilled(this, NULL);
 
 	if (this->type == VEH_TRAIN && !(this->vehstatus & VS_CRASHED)) {
 		/* Trigger station animation (trains only) */
@@ -2676,7 +2681,7 @@ void Vehicle::RemoveFromShared()
 	if (this->orders.list->GetNumVehicles() == 1) {
 		/* When there is only one vehicle, remove the shared order list window. */
 		DeleteWindowById(GetWindowClassForVehicleType(this->type), vli.Pack());
-		InvalidateVehicleOrder(this->FirstShared(), 0);
+		InvalidateVehicleOrder(this->FirstShared(), VIWD_MODIFY_ORDERS);
 	} else if (were_first) {
 		/* If we were the first one, update to the new first one.
 		 * Note: FirstShared() is already the new first */

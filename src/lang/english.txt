@@ -336,6 +336,7 @@ STR_TOOLBAR_TOOLTIP_ZOOM_THE_VIEW_IN                            :{BLACK}Zoom the
 STR_TOOLBAR_TOOLTIP_ZOOM_THE_VIEW_OUT                           :{BLACK}Zoom the view out
 STR_TOOLBAR_TOOLTIP_BUILD_RAILROAD_TRACK                        :{BLACK}Build railway track
 STR_TOOLBAR_TOOLTIP_BUILD_ROADS                                 :{BLACK}Build roads
+STR_TOOLBAR_TOOLTIP_BUILD_TRAMWAYS                              :{BLACK}Build tramways
 STR_TOOLBAR_TOOLTIP_BUILD_SHIP_DOCKS                            :{BLACK}Build ship docks
 STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Build airports
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Open the landscaping toolbar to raise/lower land, plant trees, etc.
@@ -356,6 +357,7 @@ STR_SCENEDIT_TOOLBAR_LANDSCAPE_GENERATION                       :{BLACK}Landscap
 STR_SCENEDIT_TOOLBAR_TOWN_GENERATION                            :{BLACK}Town generation
 STR_SCENEDIT_TOOLBAR_INDUSTRY_GENERATION                        :{BLACK}Industry generation
 STR_SCENEDIT_TOOLBAR_ROAD_CONSTRUCTION                          :{BLACK}Road construction
+STR_SCENEDIT_TOOLBAR_TRAM_CONSTRUCTION                          :{BLACK}Tramway construction
 STR_SCENEDIT_TOOLBAR_PLANT_TREES                                :{BLACK}Plant trees. Shift toggles building/showing cost estimate
 STR_SCENEDIT_TOOLBAR_PLACE_SIGN                                 :{BLACK}Place sign
 STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Place object. Shift toggles building/showing cost estimate
@@ -431,17 +433,15 @@ STR_INDUSTRY_MENU_INDUSTRY_CHAIN                                :Industry chains
 STR_INDUSTRY_MENU_FUND_NEW_INDUSTRY                             :Fund new industry
 ############ range ends here
 
-############ range for railway construction menu starts
 STR_RAIL_MENU_RAILROAD_CONSTRUCTION                             :Railway construction
 STR_RAIL_MENU_ELRAIL_CONSTRUCTION                               :Electrified railway construction
 STR_RAIL_MENU_MONORAIL_CONSTRUCTION                             :Monorail construction
 STR_RAIL_MENU_MAGLEV_CONSTRUCTION                               :Maglev construction
-############ range ends here
 
-############ range for road construction menu starts
 STR_ROAD_MENU_ROAD_CONSTRUCTION                                 :Road construction
+STR_ROAD_MENU_ELROAD_CONSTRUCTION                               :Electrified road construction
 STR_ROAD_MENU_TRAM_CONSTRUCTION                                 :Tramway construction
-############ range ends here
+STR_ROAD_MENU_ELTRAM_CONSTRUCTION                               :Electrified tramway construction
 
 ############ range for waterways construction menu starts
 STR_WATERWAYS_MENU_WATERWAYS_CONSTRUCTION                       :Waterways construction
@@ -1372,6 +1372,8 @@ STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_OFF                      :Off
 
 STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING                     :Left-click scrolling: {STRING2}
 STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING_HELPTEXT            :Enable scrolling the map by dragging it with the left mouse button. This is especially useful when using a touch-screen for scrolling
+STR_CONFIG_SETTING_RIGHT_MOUSE_WND_CLOSE                        :Close window on right-click: {STRING2}
+STR_CONFIG_SETTING_RIGHT_MOUSE_WND_CLOSE_HELPTEXT               :Closes a window by right-clicking inside it. Disables the tooltip on right-click!
 
 STR_CONFIG_SETTING_AUTOSAVE                                     :Autosave: {STRING2}
 STR_CONFIG_SETTING_AUTOSAVE_HELPTEXT                            :Select interval between automatic game saves
@@ -1761,6 +1763,7 @@ STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Check fo
 STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Display AI/Game script settings
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Exit 'OpenTTD'
 
+STR_INTRO_BASESET                                               :{BLACK}The currently selected base graphics set is missing {NUM} sprite{P "" s}. Please check for updates for the baseset.
 STR_INTRO_TRANSLATION                                           :{BLACK}This translation misses {NUM} string{P "" s}. Please help make OpenTTD better by signing up as translator. See readme.txt for details.
 
 # Quit window
@@ -2388,7 +2391,9 @@ STR_BRIDGE_TUBULAR_SILICON                                      :Tubular, Silico
 
 # Road construction toolbar
 STR_ROAD_TOOLBAR_ROAD_CONSTRUCTION_CAPTION                      :{WHITE}Road Construction
+STR_ROAD_TOOLBAR_ELROAD_CONSTRUCTION_CAPTION                    :{WHITE}Electrified Road Construction
 STR_ROAD_TOOLBAR_TRAM_CONSTRUCTION_CAPTION                      :{WHITE}Tramway Construction
+STR_ROAD_TOOLBAR_ELTRAM_CONSTRUCTION_CAPTION                    :{WHITE}Electrified Tramway Construction
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_SECTION                     :{BLACK}Build road section. Ctrl toggles build/remove for road construction. Shift toggles building/showing cost estimate
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAMWAY_SECTION                  :{BLACK}Build tramway section. Ctrl toggles build/remove for tramway construction. Shift toggles building/showing cost estimate
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_AUTOROAD                         :{BLACK}Build road section using the Autoroad mode. Ctrl toggles build/remove for road construction. Shift toggles building/showing cost estimate
@@ -2406,9 +2411,13 @@ STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_TUNNEL                      :{BLACK}Build ro
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAMWAY_TUNNEL                   :{BLACK}Build tramway tunnel. Shift toggles building/showing cost estimate
 STR_ROAD_TOOLBAR_TOOLTIP_TOGGLE_BUILD_REMOVE_FOR_ROAD           :{BLACK}Toggle build/remove for road construction
 STR_ROAD_TOOLBAR_TOOLTIP_TOGGLE_BUILD_REMOVE_FOR_TRAMWAYS       :{BLACK}Toggle build/remove for tramway construction
+STR_ROAD_TOOLBAR_TOOLTIP_CONVERT_ROAD                           :{BLACK}Convert/Upgrade the type of road. Shift toggles building/showing cost estimate
+STR_ROAD_TOOLBAR_TOOLTIP_CONVERT_TRAM                           :{BLACK}Convert/Upgrade the type of tram. Shift toggles building/showing cost estimate
 
 STR_ROAD_NAME_ROAD                                              :Road
+STR_ROAD_NAME_ELROAD                                            :Electrified road
 STR_ROAD_NAME_TRAM                                              :Tramway
+STR_ROAD_NAME_ELTRAM                                            :Electrified tramway
 
 # Road depot construction window
 STR_BUILD_DEPOT_ROAD_ORIENTATION_CAPTION                        :{WHITE}Road Depot Orientation
@@ -2694,7 +2703,7 @@ STR_LAI_OBJECT_DESCRIPTION_COMPANY_OWNED_LAND                   :Company-owned l
 STR_ABOUT_OPENTTD                                               :{WHITE}About OpenTTD
 STR_ABOUT_ORIGINAL_COPYRIGHT                                    :{BLACK}Original copyright {COPYRIGHT} 1995 Chris Sawyer, All rights reserved
 STR_ABOUT_VERSION                                               :{BLACK}OpenTTD version {REV}
-STR_ABOUT_COPYRIGHT_OPENTTD                                     :{BLACK}OpenTTD {COPYRIGHT} 2002-2016 The OpenTTD team
+STR_ABOUT_COPYRIGHT_OPENTTD                                     :{BLACK}OpenTTD {COPYRIGHT} 2002-2017 The OpenTTD team
 
 # Save/load game/scenario
 STR_SAVELOAD_SAVE_CAPTION                                       :{WHITE}Save Game
@@ -2913,8 +2922,6 @@ STR_NEWGRF_ERROR_INVALID_ID                                     :Attempt to use 
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{RAW_STRING} contains a corrupt sprite. All corrupt sprites will be shown as a red question mark (?)
 STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contains multiple Action 8 entries (sprite {3:NUM})
 STR_NEWGRF_ERROR_READ_BOUNDS                                    :Read past end of pseudo-sprite (sprite {3:NUM})
-STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}The currently used base graphics set is missing a number of sprites.{}Please update the base graphics set
-STR_NEWGRF_ERROR_MISSING_SPRITES_UNSTABLE                       :{WHITE}The currently used base graphics set is missing a number of sprites.{}Please update the base graphics set.{}Since you are playing a {YELLOW}development snapshot of OpenTTD{WHITE}, you might also need a {YELLOW}development snapshot of the base graphics{WHITE}
 STR_NEWGRF_ERROR_GRM_FAILED                                     :Requested GRF resources not available (sprite {3:NUM})
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:RAW_STRING} was disabled by {2:RAW_STRING}
 STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Invalid/unknown sprite layout format (sprite {3:NUM})
@@ -3121,8 +3128,8 @@ STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Accepts
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Show list of accepted cargo
 STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accepts: {WHITE}{CARGO_LIST}
 
-STR_STATIOV_VIEW_EXCLUSIVE_RIGHTS_SELF                          :{BLACK}This station has exclusive transport rights in this town.
-STR_STATIOV_VIEW_EXCLUSIVE_RIGHTS_COMPANY                       :{YELLOW}{COMPANY}{BLACK} bought exclusive transport rights in this town.
+STR_STATION_VIEW_EXCLUSIVE_RIGHTS_SELF                          :{BLACK}This station has exclusive transport rights in this town.
+STR_STATION_VIEW_EXCLUSIVE_RIGHTS_COMPANY                       :{YELLOW}{COMPANY}{BLACK} bought exclusive transport rights in this town.
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Ratings
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Show station ratings
@@ -3300,9 +3307,11 @@ STR_INDUSTRY_VIEW_REQUIRES_CARGO_CARGO                          :{BLACK}Requires
 STR_INDUSTRY_VIEW_REQUIRES_CARGO_CARGO_CARGO                    :{BLACK}Requires: {YELLOW}{STRING}{RAW_STRING}, {STRING}{RAW_STRING}, {STRING}{RAW_STRING}
 ############ range for requires ends
 
+STR_INDUSTRY_VIEW_REQUIRES                                      :{BLACK}Requires:
+STR_INDUSTRY_VIEW_ACCEPT_CARGO                                  :{YELLOW}{STRING}{BLACK}{3:RAW_STRING}
+STR_INDUSTRY_VIEW_ACCEPT_CARGO_AMOUNT                           :{YELLOW}{STRING}{BLACK}: {CARGO_SHORT} waiting{RAW_STRING}
+
 ############ range for produces starts
-STR_INDUSTRY_VIEW_WAITING_FOR_PROCESSING                        :{BLACK}Cargo waiting to be processed:
-STR_INDUSTRY_VIEW_WAITING_STOCKPILE_CARGO                       :{YELLOW}{CARGO_LONG}{RAW_STRING}{BLACK}
 STR_INDUSTRY_VIEW_PRODUCES_CARGO                                :{BLACK}Produces: {YELLOW}{STRING}{RAW_STRING}
 STR_INDUSTRY_VIEW_PRODUCES_CARGO_CARGO                          :{BLACK}Produces: {YELLOW}{STRING}{RAW_STRING}, {STRING}{RAW_STRING}
 ############ range for produces ends
@@ -3369,16 +3378,28 @@ STR_GROUP_REMOVE_ALL_VEHICLES                                   :Remove all vehi
 
 STR_GROUP_RENAME_CAPTION                                        :{BLACK}Rename a group
 
+STR_GROUP_PROFIT_THIS_YEAR                                      :Profit this year:
+STR_GROUP_PROFIT_LAST_YEAR                                      :Profit last year:
+STR_GROUP_OCCUPANCY                                             :Current usage:
+STR_GROUP_OCCUPANCY_VALUE                                       :{NUM}%
+
 # Build vehicle window
 STR_BUY_VEHICLE_TRAIN_RAIL_CAPTION                              :New Rail Vehicles
 STR_BUY_VEHICLE_TRAIN_ELRAIL_CAPTION                            :New Electric Rail Vehicles
 STR_BUY_VEHICLE_TRAIN_MONORAIL_CAPTION                          :New Monorail Vehicles
 STR_BUY_VEHICLE_TRAIN_MAGLEV_CAPTION                            :New Maglev Vehicles
 
-STR_BUY_VEHICLE_TRAIN_ALL_CAPTION                               :New Rail Vehicles
 STR_BUY_VEHICLE_ROAD_VEHICLE_CAPTION                            :New Road Vehicles
+STR_BUY_VEHICLE_ELROAD_VEHICLE_CAPTION                          :New Electric Road Vehicles
+STR_BUY_VEHICLE_TRAM_VEHICLE_CAPTION                            :New Tram Vehicles
+STR_BUY_VEHICLE_ELTRAM_VEHICLE_CAPTION                          :New Electric Tram Vehicles
+
+############ range for vehicle availability starts
+STR_BUY_VEHICLE_TRAIN_ALL_CAPTION                               :New Rail Vehicles
+STR_BUY_VEHICLE_ROAD_VEHICLE_ALL_CAPTION                        :New Road Vehicles
 STR_BUY_VEHICLE_SHIP_CAPTION                                    :New Ships
 STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :New Aircraft
+############ range for vehicle availability ends
 
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Cost: {GOLD}{CURRENCY_LONG}{BLACK} Weight: {GOLD}{WEIGHT_SHORT}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Speed: {GOLD}{VELOCITY}{BLACK} Power: {GOLD}{POWER}
@@ -3400,6 +3421,7 @@ STR_PURCHASE_INFO_ALL_TYPES                                     :All cargo types
 STR_PURCHASE_INFO_ALL_BUT                                       :All but {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Max. Tractive Effort: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Range: {GOLD}{COMMA} tiles
+STR_PURCHASE_INFO_AIRCRAFT_TYPE                                 :{BLACK}Aircraft type: {GOLD}{STRING}
 
 STR_BUY_VEHICLE_TRAIN_LIST_TOOLTIP                              :{BLACK}Train vehicle selection list. Click on vehicle for information. Ctrl+Click for toggling hiding of the vehicle type
 STR_BUY_VEHICLE_ROAD_VEHICLE_LIST_TOOLTIP                       :{BLACK}Road vehicle selection list. Click on vehicle for information. Ctrl+Click for toggling hiding of the vehicle type
@@ -3524,19 +3546,27 @@ STR_DEPOT_SELL_CONFIRMATION_TEXT                                :{YELLOW}You are
 # Engine preview window
 STR_ENGINE_PREVIEW_CAPTION                                      :{WHITE}Message from vehicle manufacturer
 STR_ENGINE_PREVIEW_MESSAGE                                      :{GOLD}We have just designed a new {STRING} - would you be interested in a year's exclusive use of this vehicle, so we can see how it performs before making it universally available?
+
 STR_ENGINE_PREVIEW_RAILROAD_LOCOMOTIVE                          :railway locomotive
-STR_ENGINE_PREVIEW_ROAD_VEHICLE                                 :road vehicle
-STR_ENGINE_PREVIEW_AIRCRAFT                                     :aircraft
-STR_ENGINE_PREVIEW_SHIP                                         :ship
+STR_ENGINE_PREVIEW_ELRAIL_LOCOMOTIVE                            :electrified railway locomotive
 STR_ENGINE_PREVIEW_MONORAIL_LOCOMOTIVE                          :monorail locomotive
 STR_ENGINE_PREVIEW_MAGLEV_LOCOMOTIVE                            :maglev locomotive
 
+STR_ENGINE_PREVIEW_ROAD_VEHICLE                                 :road vehicle
+STR_ENGINE_PREVIEW_ELROAD_VEHICLE                               :electrified road vehicle
+STR_ENGINE_PREVIEW_TRAM_VEHICLE                                 :tramway vehicle
+STR_ENGINE_PREVIEW_ELTRAM_VEHICLE                               :electrified tramway vehicle
+
+STR_ENGINE_PREVIEW_AIRCRAFT                                     :aircraft
+STR_ENGINE_PREVIEW_SHIP                                         :ship
+
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Cost: {CURRENCY_LONG} Weight: {WEIGHT_SHORT}{}Speed: {VELOCITY}  Power: {POWER}{}Running Cost: {CURRENCY_LONG}/yr{}Capacity: {CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Cost: {CURRENCY_LONG} Weight: {WEIGHT_SHORT}{}Speed: {VELOCITY}  Power: {POWER}  Max. T.E.: {6:FORCE}{}Running Cost: {4:CURRENCY_LONG}/yr{}Capacity: {5:CARGO_LONG}
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY}{}Capacity: {CARGO_LONG}, {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY}{}Capacity: {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY} Range: {COMMA} tiles{}Capacity: {CARGO_LONG}, {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY} Range: {COMMA} tiles{}Capacity: {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAP_RUNCOST                   :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY}{}Capacity: {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_TYPE_CAP_CAP_RUNCOST          :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY}{}Aircraft type: {STRING}{}Capacity: {CARGO_LONG}, {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_TYPE_CAP_RUNCOST              :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY}{}Aircraft type: {STRING}{}Capacity: {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_TYPE_RANGE_CAP_CAP_RUNCOST    :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY}{}Aircraft type: {STRING} Range: {COMMA} tiles{}Capacity: {CARGO_LONG}, {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_TYPE_RANGE_CAP_RUNCOST        :{BLACK}Cost: {CURRENCY_LONG} Max. Speed: {VELOCITY}{}Aircraft type: {STRING} Range: {COMMA} tiles{}Capacity: {CARGO_LONG}{}Running Cost: {CURRENCY_LONG}/yr
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Replace {STRING} - {STRING1}
@@ -3567,6 +3597,7 @@ STR_REPLACE_ENGINE_WAGON_SELECT_HELP                            :{BLACK}Switch b
 STR_REPLACE_ENGINES                                             :Engines
 STR_REPLACE_WAGONS                                              :Wagons
 STR_REPLACE_ALL_RAILTYPE                                        :All rail vehicles
+STR_REPLACE_ALL_ROADTYPE                                        :All road vehicles
 
 STR_REPLACE_HELP_RAILTYPE                                       :{BLACK}Choose the rail type you want to replace engines for
 STR_REPLACE_HELP_REPLACE_INFO_TAB                               :{BLACK}Displays which engine the left selected engine is being replaced with, if any
@@ -3574,6 +3605,11 @@ STR_REPLACE_RAIL_VEHICLES                                       :Rail Vehicles
 STR_REPLACE_ELRAIL_VEHICLES                                     :Electrified Rail Vehicles
 STR_REPLACE_MONORAIL_VEHICLES                                   :Monorail Vehicles
 STR_REPLACE_MAGLEV_VEHICLES                                     :Maglev Vehicles
+
+STR_REPLACE_ROAD_VEHICLES                                       :Road Vehicles
+STR_REPLACE_ELROAD_VEHICLES                                     :Electrified Road Vehicles
+STR_REPLACE_TRAM_VEHICLES                                       :Tramway Vehicles
+STR_REPLACE_ELTRAM_VEHICLES                                     :Electrified Tramway Vehicles
 
 STR_REPLACE_REMOVE_WAGON                                        :{BLACK}Wagon removal: {ORANGE}{STRING}
 STR_REPLACE_REMOVE_WAGON_HELP                                   :{BLACK}Make autoreplace keep the length of a train the same by removing wagons (starting at the front), if replacing the engine would make the train longer
@@ -3659,7 +3695,8 @@ STR_VEHICLE_INFO_AGE                                            :{COMMA} year{P 
 STR_VEHICLE_INFO_AGE_RED                                        :{RED}{COMMA} year{P "" s} ({COMMA})
 
 STR_VEHICLE_INFO_MAX_SPEED                                      :{BLACK}Max. speed: {LTBLUE}{VELOCITY}
-STR_VEHICLE_INFO_MAX_SPEED_RANGE                                :{BLACK}Max. speed: {LTBLUE}{VELOCITY} {BLACK}Range: {LTBLUE}{COMMA} tiles
+STR_VEHICLE_INFO_MAX_SPEED_TYPE                                 :{BLACK}Max. speed: {LTBLUE}{VELOCITY} {BLACK}Aircraft type: {LTBLUE}{STRING}
+STR_VEHICLE_INFO_MAX_SPEED_TYPE_RANGE                           :{BLACK}Max. speed: {LTBLUE}{VELOCITY} {BLACK}Aircraft type: {LTBLUE}{STRING} {BLACK}Range: {LTBLUE}{COMMA} tiles
 STR_VEHICLE_INFO_WEIGHT_POWER_MAX_SPEED                         :{BLACK}Weight: {LTBLUE}{WEIGHT_SHORT} {BLACK}Power: {LTBLUE}{POWER}{BLACK} Max. speed: {LTBLUE}{VELOCITY}
 STR_VEHICLE_INFO_WEIGHT_POWER_MAX_SPEED_MAX_TE                  :{BLACK}Weight: {LTBLUE}{WEIGHT_SHORT} {BLACK}Power: {LTBLUE}{POWER}{BLACK} Max. speed: {LTBLUE}{VELOCITY} {BLACK}Max. T.E.: {LTBLUE}{FORCE}
 
@@ -4295,7 +4332,8 @@ STR_ERROR_MUST_REMOVE_SIGNALS_FIRST                             :{WHITE}Must rem
 STR_ERROR_NO_SUITABLE_RAILROAD_TRACK                            :{WHITE}No suitable railway track
 STR_ERROR_MUST_REMOVE_RAILROAD_TRACK                            :{WHITE}Must remove railway track first
 STR_ERROR_CROSSING_ON_ONEWAY_ROAD                               :{WHITE}Road is one way or blocked
-STR_ERROR_CROSSING_DISALLOWED                                   :{WHITE}Level crossings not allowed for this rail type
+STR_ERROR_CROSSING_DISALLOWED_RAIL                              :{WHITE}Level crossings not allowed for this rail type
+STR_ERROR_CROSSING_DISALLOWED_ROAD                              :{WHITE}Level crossings not allowed for this road type
 STR_ERROR_CAN_T_BUILD_SIGNALS_HERE                              :{WHITE}Can't build signals here...
 STR_ERROR_CAN_T_BUILD_RAILROAD_TRACK                            :{WHITE}Can't build railway track here...
 STR_ERROR_CAN_T_REMOVE_RAILROAD_TRACK                           :{WHITE}Can't remove railway track from here...
@@ -4315,6 +4353,12 @@ STR_ERROR_CAN_T_REMOVE_ROAD_FROM                                :{WHITE}Can't re
 STR_ERROR_CAN_T_REMOVE_TRAMWAY_FROM                             :{WHITE}Can't remove tramway from here...
 STR_ERROR_THERE_IS_NO_ROAD                                      :{WHITE}... there is no road
 STR_ERROR_THERE_IS_NO_TRAMWAY                                   :{WHITE}... there is no tramway
+STR_ERROR_CAN_T_CONVERT_ROAD                                    :{WHITE}Can't convert road type here...
+STR_ERROR_CAN_T_CONVERT_TRAMWAY                                 :{WHITE}Can't convert tram type here...
+STR_ERROR_NO_SUITABLE_ROAD                                      :{WHITE}No suitable road
+STR_ERROR_NO_SUITABLE_TRAMWAY                                   :{WHITE}No suitable tramway
+STR_ERROR_INCOMPATIBLE_ROAD                                     :{WHITE}... incompatible road
+STR_ERROR_INCOMPATIBLE_TRAMWAY                                  :{WHITE}... incompatible tramway
 STR_ERROR_ROADTYPE_DOESN_T_ALLOW_JUNCTIONS                      :{WHITE}... road type doesn't allow junctions
 
 # Waterway construction errors

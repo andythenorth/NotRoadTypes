@@ -27,6 +27,24 @@ enum RoadTileType {
 };
 
 /**
+ * Test whether a tile can have road/tram subtypes.
+ * @param t Tile to query.
+ * @return true if tile can be queried about road/tram subtypes.
+ */
+static inline bool MayHaveRoad(TileIndex t)
+{
+	switch (GetTileType(t)) {
+		case MP_ROAD:
+		case MP_STATION:
+		case MP_TUNNELBRIDGE:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+/**
  * Get the type of the road tile.
  * @param t Tile to query.
  * @pre IsTileType(t, MP_ROAD)
@@ -158,18 +176,65 @@ static inline void SetRoadBits(TileIndex t, RoadBits r, RoadType rt)
 	}
 }
 
+static inline RoadSubType GetRoadSubTypeRoad(TileIndex t)
+{
+	assert(MayHaveRoad(t));
+	return (RoadSubType)GB(_m[t].m4, 0, 4);
+}
+
+static inline RoadSubType GetRoadSubTypeTram(TileIndex t)
+{
+	assert(MayHaveRoad(t));
+	return (RoadSubType)GB(_m[t].m4, 4, 4);
+}
+
+static inline RoadSubType GetRoadSubType(TileIndex t, RoadType rt)
+{
+	switch (rt) {
+		default: NOT_REACHED();
+		case ROADTYPE_ROAD: return GetRoadSubTypeRoad(t);
+		case ROADTYPE_TRAM: return GetRoadSubTypeTram(t);
+	}
+}
+
+static inline RoadTypeIdentifier GetRoadTypeRoad(TileIndex t)
+{
+	return RoadTypeIdentifier(ROADTYPE_ROAD, GetRoadSubTypeRoad(t));
+}
+
+static inline RoadTypeIdentifier GetRoadTypeTram(TileIndex t)
+{
+	return RoadTypeIdentifier(ROADTYPE_TRAM, GetRoadSubTypeTram(t));
+}
+
+static inline RoadTypeIdentifier GetRoadType(TileIndex t, RoadType rt)
+{
+	return RoadTypeIdentifier(rt, GetRoadSubType(t, rt));
+}
+
 /**
  * Get the present road types of a tile.
  * @param t The tile to query.
  * @return Present road types.
- * TODO remove this function and always use RoadTypeIdentifiers
  */
 static inline RoadTypes GetRoadTypes(TileIndex t)
 {
 	RoadTypes result = ROADTYPES_NONE;
-	if (GB(_m[t].m4, 0, 4) != INVALID_ROADSUBTYPE) result |= ROADTYPES_ROAD;
-	if (GB(_m[t].m4, 4, 4) != INVALID_ROADSUBTYPE) result |= ROADTYPES_TRAM;
+	if (MayHaveRoad(t)) {
+		if (GetRoadSubTypeRoad(t) != INVALID_ROADSUBTYPE) result |= ROADTYPES_ROAD;
+		if (GetRoadSubTypeTram(t) != INVALID_ROADSUBTYPE) result |= ROADTYPES_TRAM;
+	}
 	return result;
+}
+
+static inline bool HasRoadTypeRoad(TileIndex t)
+{
+	return GetRoadSubTypeRoad(t) != INVALID_ROADSUBTYPE;
+}
+
+static inline bool HasRoadTypeTram(TileIndex t)
+{
+	return GetRoadSubTypeTram(t) != INVALID_ROADSUBTYPE;
 }
 
 /**
@@ -180,11 +245,21 @@ static inline RoadTypes GetRoadTypes(TileIndex t)
  */
 static inline bool HasTileRoadType(TileIndex t, RoadType rt)
 {
-	switch (rt) {
-		default: NOT_REACHED();
-		case ROADTYPE_ROAD: return GB(_m[t].m4, 0, 4) != INVALID_ROADSUBTYPE;
-		case ROADTYPE_TRAM: return GB(_m[t].m4, 4, 4) != INVALID_ROADSUBTYPE;
-	}
+	return GetRoadSubType(t, rt) != INVALID_ROADSUBTYPE;
+}
+
+/**
+ * Check if a tile has one of the specified road subtypes.
+ * @param t  The tile to check.
+ * @param rt Road type to check.
+ * @param rst Allowed road subtypes.
+ * @return True if the tile has one of the specified road subtypes.
+ */
+static inline bool HasTileAnyRoadSubType(TileIndex t, RoadType rt, RoadSubTypes rst)
+{
+	if (!MayHaveRoad(t)) return false;
+	RoadSubType st = GetRoadSubType(t, rt) ;
+	return st != INVALID_ROADSUBTYPE && HasBit(rst, st);
 }
 
 /**
@@ -195,7 +270,7 @@ static inline bool HasTileRoadType(TileIndex t, RoadType rt)
  */
 static inline Owner GetRoadOwner(TileIndex t, RoadType rt)
 {
-	assert(IsTileType(t, MP_ROAD) || IsTileType(t, MP_STATION) || IsTileType(t, MP_TUNNELBRIDGE));
+	assert(MayHaveRoad(t));
 	switch (rt) {
 		default: NOT_REACHED();
 		case ROADTYPE_ROAD: return (Owner)GB(IsNormalRoadTile(t) ? _m[t].m1 : _me[t].m7, 0, 5);
@@ -537,16 +612,6 @@ static inline DiagDirection GetRoadDepotDirection(TileIndex t)
 
 RoadBits GetAnyRoadBits(TileIndex tile, RoadType rt, bool straight_tunnel_bridge_entrance = false);
 
-static inline RoadTypeIdentifier GetRoadTypeRoad(TileIndex t)
-{
-	return RoadTypeIdentifier(ROADTYPE_ROAD, (RoadSubType)GB(_m[t].m4, 0, 4));
-}
-
-static inline RoadTypeIdentifier GetRoadTypeTram(TileIndex t)
-{
-	return RoadTypeIdentifier(ROADTYPE_TRAM, (RoadSubType)GB(_m[t].m4, 4, 4));
-}
-
 struct RoadTypeIdentifiers {
 	RoadTypeIdentifier road_identifier;
 	RoadTypeIdentifier tram_identifier;
@@ -560,7 +625,7 @@ struct RoadTypeIdentifiers {
 	 */
 	static RoadTypeIdentifiers FromTile(TileIndex t)
 	{
-		assert(IsTileType(t, MP_ROAD) || IsTileType(t, MP_STATION) || IsTileType(t, MP_TUNNELBRIDGE));
+		assert(MayHaveRoad(t));
 
 		RoadTypeIdentifiers rtids;
 		rtids.road_identifier = GetRoadTypeRoad(t);
@@ -627,11 +692,11 @@ struct RoadTypeIdentifiers {
 	{
 		RoadTypes rot = ROADTYPES_NONE;
 
-		if (road_identifier.IsValid()) {
+		if (this->road_identifier.IsValid()) {
 			rot |= ROADTYPES_ROAD;
 		}
 
-		if (tram_identifier.IsValid()) {
+		if (this->tram_identifier.IsValid()) {
 			rot |= ROADTYPES_TRAM;
 		}
 
@@ -658,28 +723,26 @@ struct RoadTypeIdentifiers {
 
 	bool HasRoad() const
 	{
-		return road_identifier.IsValid();
+		return this->road_identifier.IsValid();
 	}
 
 	bool HasTram() const
 	{
-		return tram_identifier.IsValid();
+		return this->tram_identifier.IsValid();
 	}
 
 	/**
-	 * Merge a new road type identifier into the current one
+	 * Merge a new road type identifier into the current one.
+	 * If the roadtype is already present, the new subtype replaces the old one.
 	 * @param rtid The new RoadTypeIdentifier to merge into the current one
-	 * @return true on success (current behaviour = always success)
 	 */
-	bool MergeRoadType(RoadTypeIdentifier rtid)
+	void MergeRoadType(RoadTypeIdentifier rtid)
 	{
 		switch (rtid.basetype) {
 			default: NOT_REACHED();
-			case ROADTYPE_ROAD: road_identifier = rtid; break;
-			case ROADTYPE_TRAM: tram_identifier = rtid; break;
+			case ROADTYPE_ROAD: this->road_identifier = rtid; break;
+			case ROADTYPE_TRAM: this->tram_identifier = rtid; break;
 		}
-
-		return true;
 	};
 
 	/**
@@ -689,15 +752,15 @@ struct RoadTypeIdentifiers {
 	{
 		switch (rt) {
 			default: NOT_REACHED();
-			case ROADTYPE_ROAD: road_identifier = RoadTypeIdentifier(); break;
-			case ROADTYPE_TRAM: tram_identifier = RoadTypeIdentifier(); break;
+			case ROADTYPE_ROAD: this->road_identifier = RoadTypeIdentifier(); break;
+			case ROADTYPE_TRAM: this->tram_identifier = RoadTypeIdentifier(); break;
 		}
 	}
 };
 
 #define FOR_EACH_SET_ROADTYPEIDENTIFIER(var, rtids) \
-  for (RoadType ___FESRTID = ROADTYPE_BEGIN; ___FESRTID < ROADTYPE_END; ___FESRTID++) \
-    if ((var = rtids.GetType(___FESRTID)).IsValid())
+	for (RoadType ___FESRTID = ROADTYPE_BEGIN; ___FESRTID < ROADTYPE_END; ___FESRTID++) \
+		if ((var = rtids.GetType(___FESRTID)).IsValid())
 
 /**
  * Set the present road types of a tile.
@@ -706,18 +769,9 @@ struct RoadTypeIdentifiers {
  */
 static inline void SetRoadTypes(TileIndex t, RoadTypeIdentifiers rtids)
 {
+	assert(MayHaveRoad(t));
 	SB(_m[t].m4, 0, 4, rtids.road_identifier.subtype);
 	SB(_m[t].m4, 4, 4, rtids.tram_identifier.subtype);
-}
-
-static inline bool HasRoadTypeRoad(TileIndex t)
-{
-	return RoadTypeIdentifiers::FromTile(t).road_identifier.IsValid();
-}
-
-static inline bool HasRoadTypeTram(TileIndex t)
-{
-	return RoadTypeIdentifiers::FromTile(t).tram_identifier.IsValid();
 }
 
 /**
