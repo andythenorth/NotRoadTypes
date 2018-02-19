@@ -4382,6 +4382,10 @@ static ChangeInfoResult RoadTypeChangeInfo(uint id, int numinfo, int prop, ByteR
 				for (int j = buf->ReadByte(); j != 0; j--) buf->ReadDWord();
 				break;
 
+			case 0x1E: // Town road choice weight
+				rti->town_road_choice_weight = buf->ReadByte();
+				break;
+
 			default:
 				ret = CIR_UNKNOWN;
 				break;

@@ -173,12 +173,7 @@ public:
 	const SpriteGroup *group[ROTSG_END];
 
 	/**
-	 * This road can be used as town road.
-	 */
-	bool is_town_road;
-
-	/**
-	 * If multiple town roads are present, decide which one to use with the weight.
+	 * If set the roadtype can be used as town road, decide which one to use with the weight.
 	 */
 	byte town_road_choice_weight;
 

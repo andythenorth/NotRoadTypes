@@ -341,7 +341,7 @@ RoadTypeIdentifier GetRandomRoadType(RoadType rt, CompanyID owner)
 			const RoadtypeInfo *rti = GetRoadTypeInfo(_sorted_roadtypes[rt][i]);
 
 			// check if the roadtype has the property set and it's available to date
-			if (!rti->is_town_road || rti->introduction_date > _date) continue;
+			if (rti->town_road_choice_weight == 0x0 || rti->introduction_date > _date) continue;
 
 			// If the roadtype has the no-houses feature, then it's pointless to have it as town road
 			if (HasBit(rti->flags, ROTF_NO_HOUSES)) continue;
