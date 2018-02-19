@@ -27,11 +27,13 @@ enum RoadTypeFlags {
 	ROTF_CATENARY = 0,                                     ///< Bit number for adding catenary
 	ROTF_NO_LEVEL_CROSSING,                                ///< Bit number for disabling level crossing
 	ROTF_NO_HOUSES,                                        ///< Bit number for setting this roadtype as not house friendly
+	ROTF_TOWN_ROAD,                                        ///< Bit number for setting this roadtype as available as town road
 
 	ROTFB_NONE = 0,                                        ///< All flags cleared.
 	ROTFB_CATENARY = 1 << ROTF_CATENARY,                   ///< Value for drawing a catenary.
 	ROTFB_NO_LEVEL_CROSSING = 1 << ROTF_NO_LEVEL_CROSSING, ///< Value for disabling a level crossing.
 	ROTFB_NO_HOUSES = 1 << ROTF_NO_HOUSES,                 ///< Value for for setting this roadtype as not house friendly.
+	ROTFB_TOWN_ROAD = 1 << ROTF_TOWN_ROAD,                 ///< Value for setting this roadtype as available as town road.
 };
 DECLARE_ENUM_AS_BIT_SET(RoadTypeFlags)
 

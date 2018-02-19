@@ -1953,13 +1953,18 @@ static void TileLoop_Road(TileIndex tile)
 	} else if (IncreaseRoadWorksCounter(tile)) {
 		TerminateRoadWorks(tile);
 
+		// Chance of changing the roadtype to the one of the town
+		RoadTypeIdentifiers rtids = RoadTypeIdentifiers::FromTile(tile);
+		rtids.MergeRoadType(GetRoadTypeRoad(t->xy));
+		SetRoadTypes(tile, rtids);
+
 		if (_settings_game.economy.mod_road_rebuild) {
 			/* Generate a nicer town surface */
 			const RoadBits old_rb = GetAnyRoadBits(tile, ROADTYPE_ROAD);
 			const RoadBits new_rb = CleanUpRoadBits(tile, old_rb);
 
 			if (old_rb != new_rb) {
-				RemoveRoad(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, (old_rb ^ new_rb), RoadTypeIdentifier(ROADTYPE_ROAD, ROADSUBTYPE_NORMAL), true);
+				RemoveRoad(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, (old_rb ^ new_rb), GetRoadTypeRoad(tile), true);
 			}
 		}
 

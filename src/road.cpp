@@ -22,6 +22,7 @@
 #include "road.h"
 #include "road_func.h"
 #include "roadveh.h"
+#include "core\random_func.hpp"
 
 #include "safeguards.h"
 
@@ -327,4 +328,31 @@ bool CanBuildRoadTypeInfrastructure(RoadTypeIdentifier rtid, CompanyID company)
 	}
 
 	return false;
+}
+
+RoadTypeIdentifier GetRandomRoadType(RoadType rt, CompanyID owner)
+{
+	RoadTypeIdentifier rtid(ROADTYPE_ROAD, ROADSUBTYPE_NORMAL);
+	RoadTypeIdentifier available_to_build[ROADSUBTYPE_END];
+	uint num = 0;
+
+	for (uint8 i = 0; i < _sorted_roadtypes_size[rt]; i++) {
+		if (owner >= MAX_COMPANIES) {
+			const RoadtypeInfo *rti = GetRoadTypeInfo(_sorted_roadtypes[rt][i]);
+			if (HasBit(rti->flags, ROTF_NO_HOUSES)) continue;
+			if (HasBit(rti->flags, ROTF_CATENARY)) continue;
+			if (!HasBit(rti->flags, ROTF_TOWN_ROAD)) continue;
+		}
+
+		available_to_build[num] = _sorted_roadtypes[rt][i];
+		num++;
+	}
+
+	if (num > 0) {
+		uint rnd = RandomRange(num);
+
+		rtid = available_to_build[rnd];
+	}
+
+	return rtid;
 }
