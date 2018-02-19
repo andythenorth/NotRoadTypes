@@ -339,9 +339,15 @@ RoadTypeIdentifier GetRandomRoadType(RoadType rt, CompanyID owner)
 	for (uint8 i = 0; i < _sorted_roadtypes_size[rt]; i++) {
 		if (owner >= MAX_COMPANIES) {
 			const RoadtypeInfo *rti = GetRoadTypeInfo(_sorted_roadtypes[rt][i]);
+
+			// check if the roadtype has the property set and it's available to date
+			if (!rti->is_town_road || rti->introduction_date > _date) continue;
+
+			// If the roadtype has the no-houses feature, then it's pointless to have it as town road
 			if (HasBit(rti->flags, ROTF_NO_HOUSES)) continue;
+
+			// TODO: always discard electric types?
 			if (HasBit(rti->flags, ROTF_CATENARY)) continue;
-			if (!HasBit(rti->flags, ROTF_TOWN_ROAD)) continue;
 		}
 
 		available_to_build[num] = _sorted_roadtypes[rt][i];

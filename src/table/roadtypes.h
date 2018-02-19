@@ -97,6 +97,12 @@ static const RoadtypeInfo _original_roadtypes[] = {
 
 		{ NULL },
 		{ NULL },
+
+		/* is town road */
+		false,
+
+		/* town road choice weight */
+		0x0,
 	},
 	/** Electrified Road */
 	{
@@ -176,6 +182,12 @@ static const RoadtypeInfo _original_roadtypes[] = {
 
 		{ NULL },
 		{ NULL },
+
+		/* is town road */
+		false,
+
+		/* town road choice weight */
+		0x0,
 	},
 };
 
@@ -258,6 +270,12 @@ static const RoadtypeInfo _original_tramtypes[] = {
 
 		{ NULL },
 		{ NULL },
+
+		/* is town road */
+		false,
+
+		/* town road choice weight */
+		0x0,
 	},
 	/** Electrified Tram */
 	{
@@ -337,6 +355,12 @@ static const RoadtypeInfo _original_tramtypes[] = {
 
 		{ NULL },
 		{ NULL },
+
+		/* is town road */
+		false,
+
+		/* town road choice weight */
+		0x0,
 	},
 };
 
