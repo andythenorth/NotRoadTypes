@@ -329,36 +329,3 @@ bool CanBuildRoadTypeInfrastructure(RoadTypeIdentifier rtid, CompanyID company)
 
 	return false;
 }
-
-RoadTypeIdentifier GetRandomRoadType(RoadType rt, CompanyID owner)
-{
-	RoadTypeIdentifier rtid(ROADTYPE_ROAD, ROADSUBTYPE_NORMAL);
-	RoadTypeIdentifier available_to_build[ROADSUBTYPE_END];
-	uint num = 0;
-
-	for (uint8 i = 0; i < _sorted_roadtypes_size[rt]; i++) {
-		if (owner >= MAX_COMPANIES) {
-			const RoadtypeInfo *rti = GetRoadTypeInfo(_sorted_roadtypes[rt][i]);
-
-			// check if the roadtype has the property set and it's available to date
-			if (rti->town_road_choice_weight == 0x0 || rti->introduction_date > _date) continue;
-
-			// If the roadtype has the no-houses feature, then it's pointless to have it as town road
-			if (HasBit(rti->flags, ROTF_NO_HOUSES)) continue;
-
-			// TODO: always discard electric types?
-			if (HasBit(rti->flags, ROTF_CATENARY)) continue;
-		}
-
-		available_to_build[num] = _sorted_roadtypes[rt][i];
-		num++;
-	}
-
-	if (num > 0) {
-		uint rnd = RandomRange(num);
-
-		rtid = available_to_build[rnd];
-	}
-
-	return rtid;
-}

@@ -50,7 +50,9 @@ typedef SmallVector<RoadVehicle *, 16> RoadVehicleList;
 
 RoadtypeInfo _roadtypes[ROADTYPE_END][ROADSUBTYPE_END];
 RoadTypeIdentifier _sorted_roadtypes[ROADTYPE_END][ROADSUBTYPE_END];
+RoadTypeIdentifier _town_roadtypes[ROADSUBTYPE_END];
 uint8 _sorted_roadtypes_size[ROADTYPE_END];
+uint8 _town_roadtypes_size;
 
 /**
  * Reset all road type information to its default values.
@@ -109,6 +111,17 @@ static int CDECL CompareRoadTypes(const RoadTypeIdentifier *first, const RoadTyp
 }
 
 /**
+* Compare roadtypes based on their choice weight.
+* @param first  The roadtype to compare to.
+* @param second The roadtype to compare.
+* @return True iff the first should be sorted before the second.
+*/
+static int CDECL CompareTownRoadTypes(const RoadTypeIdentifier * first, const RoadTypeIdentifier *second)
+{
+	return GetRoadTypeInfo(*first)->town_road_choice_weight - GetRoadTypeInfo(*second)->town_road_choice_weight;
+}
+
+/**
  * Resolve sprites of custom road types
  */
 void InitRoadTypes()
@@ -127,6 +140,24 @@ void InitRoadTypes()
 		}
 		QSortT(_sorted_roadtypes[rt], _sorted_roadtypes_size[rt], CompareRoadTypes);
 	}
+
+	/* Setup the available types for towns to build, sorted by weight. */
+	for (RoadSubType rst = ROADSUBTYPE_BEGIN; rst != ROADSUBTYPE_END; rst++) {
+		RoadtypeInfo *rti = &_roadtypes[ROADTYPE_ROAD][rst];
+
+		/* Check if the roadtype has the weight set */
+		if (rti->town_road_choice_weight == 0x0) continue;
+
+		/* If the roadtype has the no-houses feature, then it's pointless to have it as town road */
+		if (HasBit(rti->flags, ROTF_NO_HOUSES)) continue;
+
+		/* TODO: always discard electric types? */
+		if (HasBit(rti->flags, ROTF_CATENARY)) continue;
+
+		_town_roadtypes[_town_roadtypes_size++] = RoadTypeIdentifier(ROADTYPE_ROAD, rst);
+	}
+
+	QSortT(_town_roadtypes, _town_roadtypes_size, CompareTownRoadTypes);
 }
 
 /**

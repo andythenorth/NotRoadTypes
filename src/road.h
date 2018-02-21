@@ -267,7 +267,8 @@ bool CanBuildRoadTypeInfrastructure(RoadTypeIdentifier rtid, CompanyID company);
 
 extern RoadTypeIdentifier _sorted_roadtypes[ROADTYPE_END][ROADSUBTYPE_END];
 extern uint8 _sorted_roadtypes_size[ROADTYPE_END];
-
+extern RoadTypeIdentifier _town_roadtypes[ROADSUBTYPE_END];
+extern uint8 _town_roadtypes_size;
 /**
  * Loop header for iterating over roadtypes, sorted by sortorder.
  * @param var Roadtype.

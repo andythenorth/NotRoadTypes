@@ -17,6 +17,5 @@
 
 void DrawRoadDepotSprite(int x, int y, DiagDirection dir, RoadTypeIdentifier rtid);
 void UpdateNearestTownForRoadTiles(bool invalidate);
-RoadTypeIdentifier GetRandomRoadType(RoadType rt, CompanyID owner);
 
 #endif /* ROAD_CMD_H */

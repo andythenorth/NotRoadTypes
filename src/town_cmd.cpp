@@ -1477,6 +1477,29 @@ static RoadBits GenRandomRoadBits()
 }
 
 /**
+* Returns a random road RoadType to be used by towns
+* @return the RoadTypeIdentifier to build
+*/
+RoadTypeIdentifier GetRandomRoadType()
+{
+	RoadTypeIdentifier rtid(ROADTYPE_ROAD, ROADSUBTYPE_NORMAL);
+
+	uint rnd = RandomRange(255);
+
+	for (uint8 i = 0; i < _town_roadtypes_size; i++)
+	{
+		const RoadtypeInfo *rti = GetRoadTypeInfo(_town_roadtypes[i]);
+		if (rti->introduction_date > _date) continue;
+
+		if (rti->town_road_choice_weight <= rnd) continue;
+
+		return _town_roadtypes[i];;
+	}
+
+	return rtid;
+}
+
+/**
  * Grow the town
  * @param t town to grow
  * @return true iff something (house, road, bridge, ...) was built
@@ -1527,7 +1550,7 @@ static bool GrowTown(Town *t)
 					if (IsNormalRoadTile(t->xy)) {
 						rtid = GetRoadTypeRoad(t->xy);
 					} else {
-						rtid = GetRandomRoadType(ROADTYPE_ROAD, OWNER_TOWN);
+						rtid = GetRandomRoadType();
 					}
 					
 					DoCommand(tile, GenRandomRoadBits() | (rtid.Pack() << 4), t->index, DC_EXEC | DC_AUTO, CMD_BUILD_ROAD);
